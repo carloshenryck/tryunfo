@@ -18,7 +18,7 @@ class Form extends React.Component {
     } = this.props;
 
     return (
-      <form>
+      <form onSubmit={ (e) => e.preventDefault() }>
         <label htmlFor="name">
           Nome
           <input
