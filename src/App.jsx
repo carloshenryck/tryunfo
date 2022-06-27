@@ -74,7 +74,7 @@ class App extends React.Component {
 
   onSaveButtonClick = () => {
     const { cardName, cardDescription, cardAttr1, cardAttr2,
-      cardAttr3, cardImage, cardRare, cardTrunfo, cards } = this.state;
+      cardAttr3, cardImage, cardRare, cardTrunfo, hasTrunfo, cards } = this.state;
 
     const card = {
       cardName,
@@ -87,11 +87,36 @@ class App extends React.Component {
       cardTrunfo,
     };
 
+    if (cardTrunfo && !hasTrunfo) {
+      this.setState({
+        cards: [...cards, card],
+        hasTrunfo: card.cardTrunfo,
+      }, this.cleanInputs);
+    }
+
     this.setState({
       cards: [...cards, card],
-      hasTrunfo: card.cardTrunfo,
     }, this.cleanInputs);
   };
+
+  deleteCard = ({ target }) => {
+    const cardElement = target.parentNode;
+    const name = cardElement.firstChild.textContent;
+    const { cards } = this.state;
+    const trunfo = cardElement.childNodes[7];
+
+    const newCards = cards.filter((card) => card.cardName !== name);
+    if (trunfo.tagName === 'P') {
+      this.setState({
+        cards: newCards,
+        hasTrunfo: false,
+      });
+    }
+
+    this.setState({
+      cards: newCards,
+    });
+  }
 
   render() {
     const {
@@ -134,6 +159,7 @@ class App extends React.Component {
           cardImage={ cardImage }
           cardRare={ cardRare }
           cardTrunfo={ cardTrunfo }
+          canDelete={ false }
         />
 
         <h1>Cards</h1>
@@ -149,6 +175,8 @@ class App extends React.Component {
             cardImage={ card.cardImage }
             cardRare={ card.cardRare }
             cardTrunfo={ card.cardTrunfo }
+            canDelete
+            deleteCard={ this.deleteCard }
           />
         )) }
       </>
