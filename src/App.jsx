@@ -68,7 +68,6 @@ class App extends React.Component {
       cardImage: '',
       cardRare: 'normal',
       cardTrunfo: false,
-      hasTrunfo: false,
       isSaveButtonDisabled: true,
     });
   }
@@ -90,6 +89,7 @@ class App extends React.Component {
 
     this.setState({
       cards: [...cards, card],
+      hasTrunfo: card.cardTrunfo,
     }, this.cleanInputs);
   };
 
