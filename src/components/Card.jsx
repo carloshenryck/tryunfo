@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import '../styles/card.css';
 
 class Card extends React.Component {
   render() {
@@ -12,31 +13,43 @@ class Card extends React.Component {
       cardImage,
       cardRare,
       cardTrunfo,
-      canDelete,
-      deleteCard,
+      previewTitle,
+      cardClass,
     } = this.props;
 
-    const deleteButton = (
-      <button
-        type="button"
-        data-testid="delete-button"
-        onClick={ deleteCard }
-      >
-        Excluir
-      </button>
-    );
-
     return (
-      <div>
-        <p data-testid="name-card">{cardName}</p>
-        <img src={ cardImage } alt={ cardName } data-testid="image-card" />
-        <p data-testid="description-card">{cardDescription}</p>
-        <p data-testid="attr1-card">{cardAttr1}</p>
-        <p data-testid="attr2-card">{cardAttr2}</p>
-        <p data-testid="attr3-card">{cardAttr3}</p>
-        <p data-testid="rare-card">{cardRare}</p>
-        { cardTrunfo === true && <p data-testid="trunfo-card">Super Trunfo</p> }
-        { canDelete && deleteButton }
+      <div className={ cardClass }>
+        { previewTitle && <h1 className="previewTitle">Pré-visualização</h1>}
+        <div className="preview">
+          <div className="background">
+            <div className="cardTitle">
+              <p data-testid="name-card">{cardName}</p>
+            </div>
+            <img src={ cardImage } alt={ cardName } data-testid="image-card" />
+            <p
+              data-testid="description-card"
+              className="description"
+            >
+              {cardDescription}
+            </p>
+            <div className="infoSection">
+              <p data-testid="attr1-card" className="attr">
+                Attr01...........................
+                {cardAttr1}
+              </p>
+              <p data-testid="attr2-card" className="attr">
+                Attr02...........................
+                {cardAttr2}
+              </p>
+              <p data-testid="attr3-card" className="attr">
+                Attr03...........................
+                {cardAttr3}
+              </p>
+              <p data-testid="rare-card">{cardRare}</p>
+              { cardTrunfo === true && <p data-testid="trunfo-card">Super Trunfo</p> }
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -51,8 +64,7 @@ Card.propTypes = {
   cardImage: PropTypes.string,
   cardRare: PropTypes.string,
   cardTrunfo: PropTypes.bool,
-  canDelete: PropTypes.bool,
-  deleteCard: PropTypes.func,
+  cardClass: PropTypes.string,
 }.required;
 
 export default Card;
