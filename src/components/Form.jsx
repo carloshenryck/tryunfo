@@ -67,7 +67,6 @@ class Form extends React.Component {
               name="cardDescription"
               value={ cardDescription }
               onChange={ onInputChange }
-              maxLength="60"
             />
           </label>
           <label htmlFor="attr01" className="labelInSameLine">

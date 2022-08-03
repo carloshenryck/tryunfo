@@ -17,13 +17,17 @@ class App extends React.Component {
       cardTrunfo: false,
       hasTrunfo: false,
       isSaveButtonDisabled: true,
+      searchInput: '',
       cards: [],
+      filteredCards: [],
     };
   }
 
   verifyAttrs = () => {
     const { cardAttr1, cardAttr2, cardAttr3 } = this.state;
-    const attrs = [parseInt(cardAttr1, 10), parseInt(cardAttr2, 10),
+    const attrs = [
+      parseInt(cardAttr1, 10),
+      parseInt(cardAttr2, 10),
       parseInt(cardAttr3, 10)];
     const max = 90;
     const min = 0;
@@ -120,6 +124,20 @@ class App extends React.Component {
     });
   }
 
+  searchCard = ({ target: { value } }) => {
+    this.setState({ searchInput: value }, () => {
+      const { searchInput, cards } = this.state;
+
+      if (searchInput !== '') {
+        console.log(searchInput);
+        const filteredCards = cards.filter((card) => (
+          card.cardName.toLowerCase().includes(searchInput.toLowerCase())
+        ));
+        this.setState({ filteredCards });
+      }
+    });
+  }
+
   render() {
     const {
       cardName,
@@ -133,7 +151,36 @@ class App extends React.Component {
       hasTrunfo,
       isSaveButtonDisabled,
       cards,
+      searchInput,
+      filteredCards,
     } = this.state;
+
+    const renderCards = (cardsArr) => (
+      cardsArr.map((card) => (
+        <div className="cardWrapper" key={ card.cardName }>
+          <Card
+            cardName={ card.cardName }
+            cardDescription={ card.cardDescription }
+            cardAttr1={ card.cardAttr1 }
+            cardAttr2={ card.cardAttr2 }
+            cardAttr3={ card.cardAttr3 }
+            cardImage={ card.cardImage }
+            cardRare={ card.cardRare }
+            cardTrunfo={ card.cardTrunfo }
+            cardClass="cardWrapper"
+            previewTitle={ false }
+          />
+          <button
+            type="button"
+            data-testid="delete-button"
+            className="deleteButton"
+            onClick={ this.deleteCard }
+          >
+            Excluir
+          </button>
+        </div>
+      ))
+    );
 
     return (
       <>
@@ -169,30 +216,14 @@ class App extends React.Component {
 
         <h1>Cards</h1>
 
-        { cards.map((card) => (
-          <div className="cardWrapper" key={ card.cardName }>
-            <Card
-              cardName={ card.cardName }
-              cardDescription={ card.cardDescription }
-              cardAttr1={ card.cardAttr1 }
-              cardAttr2={ card.cardAttr2 }
-              cardAttr3={ card.cardAttr3 }
-              cardImage={ card.cardImage }
-              cardRare={ card.cardRare }
-              cardTrunfo={ card.cardTrunfo }
-              cardClass="cardWrapper"
-              previewTitle={ false }
-            />
-            <button
-              type="button"
-              data-testid="delete-button"
-              className="deleteButton"
-              onClick={ this.deleteCard }
-            >
-              Excluir
-            </button>
-          </div>
-        )) }
+        <input
+          type="text"
+          id="nameFilter"
+          onChange={ (e) => this.searchCard(e) }
+          data-testid="name-filter"
+        />
+
+        { searchInput.length >= 1 ? renderCards(filteredCards) : renderCards(cards) }
       </>
     );
   }
