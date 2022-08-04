@@ -18,6 +18,7 @@ class App extends React.Component {
       hasTrunfo: false,
       isSaveButtonDisabled: true,
       isFiltered: false,
+      isTrunfoFiltered: false,
       searchInput: '',
       rarityInput: 'todas',
       cards: [],
@@ -84,20 +85,17 @@ class App extends React.Component {
   onSaveButtonClick = () => {
     const { cardName, cardDescription, cardAttr1, cardAttr2,
       cardAttr3, cardImage, cardRare, cardTrunfo, hasTrunfo, cards } = this.state;
-    const card = {
-      cardName,
+    const card = { cardName,
       cardDescription,
       cardAttr1,
       cardAttr2,
       cardAttr3,
       cardImage,
       cardRare,
-      cardTrunfo,
-    };
+      cardTrunfo };
     if (cardTrunfo && !hasTrunfo) {
       this.setState({
-        cards: [...cards, card],
-        hasTrunfo: card.cardTrunfo,
+        cards: [...cards, card], hasTrunfo: card.cardTrunfo,
       }, this.cleanInputs);
     }
     this.setState({
@@ -113,23 +111,9 @@ class App extends React.Component {
     const newCards = cards.filter((card) => card.cardName !== name);
     const cardElement = cards.find((card) => card.cardName === name);
     if (cardElement.cardTrunfo) {
-      this.setState({
-        cards: newCards,
-        hasTrunfo: false,
-      });
+      this.setState({ cards: newCards, hasTrunfo: false });
     }
-    this.setState({
-      cards: newCards,
-    });
-  }
-
-  isFiltered = () => {
-    const { rarityInput, searchInput } = this.state;
-    if (rarityInput !== 'todas' || searchInput !== '') {
-      this.setState({ isFiltered: true });
-    } else {
-      this.setState({ isFiltered: false });
-    }
+    this.setState({ cards: newCards });
   }
 
   filterCard = () => {
@@ -151,21 +135,23 @@ class App extends React.Component {
     this.setState({ filteredCards, isFiltered });
   }
 
+  showTrunfo = (value) => {
+    if (!value) { this.setState({ isTrunfoFiltered: false }); this.filterCard(); } else {
+      const { cards } = this.state;
+      const trunfo = cards.find((card) => card.cardTrunfo);
+      this.setState({
+        filteredCards: trunfo ? [trunfo] : [],
+        isFiltered: true,
+        isTrunfoFiltered: true,
+      });
+    }
+  }
+
   render() {
     const {
-      cardName,
-      cardDescription,
-      cardAttr1,
-      cardAttr2,
-      cardAttr3,
-      cardImage,
-      cardRare,
-      cardTrunfo,
-      hasTrunfo,
-      isSaveButtonDisabled,
-      cards,
-      filteredCards,
-      isFiltered,
+      cardName, cardDescription, cardAttr1, cardAttr2, cardAttr3, cardImage, cardRare,
+      cardTrunfo, hasTrunfo, isSaveButtonDisabled, cards,
+      filteredCards, isFiltered, isTrunfoFiltered,
     } = this.state;
     const renderCards = (cardsArr) => (
       cardsArr.map((card) => (
@@ -230,18 +216,26 @@ class App extends React.Component {
           name="searchInput"
           onChange={ this.onInputChange }
           data-testid="name-filter"
+          disabled={ isTrunfoFiltered }
         />
         <select
           id="filterByRarity"
           data-testid="rare-filter"
           name="rarityInput"
           onChange={ this.onInputChange }
+          disabled={ isTrunfoFiltered }
         >
           <option value="todas">todas</option>
           <option value="normal">normal</option>
           <option value="raro">raro</option>
           <option value="muito raro">muito raro</option>
         </select>
+        <input
+          type="checkbox"
+          id="trunfo"
+          data-testid="trunfo-filter"
+          onClick={ (e) => this.showTrunfo(e.target.checked) }
+        />
         { isFiltered ? renderCards(filteredCards) : renderCards(cards) }
       </>
     );
