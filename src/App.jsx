@@ -17,7 +17,9 @@ class App extends React.Component {
       cardTrunfo: false,
       hasTrunfo: false,
       isSaveButtonDisabled: true,
+      isFiltered: false,
       searchInput: '',
+      rarityInput: 'todas',
       cards: [],
       filteredCards: [],
     };
@@ -38,14 +40,12 @@ class App extends React.Component {
         return false;
       }
     }
-
     const sum = attrs.reduce((acc, i) => acc + i, 0);
     return sum <= maxSum;
   }
 
   validateButton = () => {
     const { cardName, cardDescription, cardImage } = this.state;
-
     if (cardName !== '' && cardDescription !== ''
     && cardImage !== '' && this.verifyAttrs()) {
       this.setState({ isSaveButtonDisabled: false });
@@ -57,10 +57,14 @@ class App extends React.Component {
   onInputChange = ({ target }) => {
     const { name } = target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
-
     this.setState({
       [name]: value,
-    }, this.validateButton);
+    }, () => {
+      this.validateButton();
+      if (name === 'searchInput' || name === 'rarityInput') {
+        this.filterCard();
+      }
+    });
   };
 
   cleanInputs = () => {
@@ -80,7 +84,6 @@ class App extends React.Component {
   onSaveButtonClick = () => {
     const { cardName, cardDescription, cardAttr1, cardAttr2,
       cardAttr3, cardImage, cardRare, cardTrunfo, hasTrunfo, cards } = this.state;
-
     const card = {
       cardName,
       cardDescription,
@@ -91,14 +94,12 @@ class App extends React.Component {
       cardRare,
       cardTrunfo,
     };
-
     if (cardTrunfo && !hasTrunfo) {
       this.setState({
         cards: [...cards, card],
         hasTrunfo: card.cardTrunfo,
       }, this.cleanInputs);
     }
-
     this.setState({
       cards: [...cards, card],
     }, this.cleanInputs);
@@ -109,7 +110,6 @@ class App extends React.Component {
     const name = parentElement.firstChild.firstChild
       .firstChild.firstChild.firstChild.textContent;
     const { cards } = this.state;
-
     const newCards = cards.filter((card) => card.cardName !== name);
     const cardElement = cards.find((card) => card.cardName === name);
     if (cardElement.cardTrunfo) {
@@ -118,24 +118,37 @@ class App extends React.Component {
         hasTrunfo: false,
       });
     }
-
     this.setState({
       cards: newCards,
     });
   }
 
-  searchCard = ({ target: { value } }) => {
-    this.setState({ searchInput: value }, () => {
-      const { searchInput, cards } = this.state;
+  isFiltered = () => {
+    const { rarityInput, searchInput } = this.state;
+    if (rarityInput !== 'todas' || searchInput !== '') {
+      this.setState({ isFiltered: true });
+    } else {
+      this.setState({ isFiltered: false });
+    }
+  }
 
-      if (searchInput !== '') {
-        console.log(searchInput);
-        const filteredCards = cards.filter((card) => (
-          card.cardName.toLowerCase().includes(searchInput.toLowerCase())
-        ));
-        this.setState({ filteredCards });
-      }
-    });
+  filterCard = () => {
+    const { cards, searchInput, rarityInput } = this.state;
+    let filteredCards = cards;
+    let isFiltered = false;
+    if (searchInput !== '') {
+      filteredCards = filteredCards.filter((card) => (
+        card.cardName.toLowerCase().includes(searchInput.toLowerCase())
+      ));
+      isFiltered = true;
+    }
+    if (rarityInput !== 'todas') {
+      filteredCards = filteredCards.filter((card) => (
+        card.cardRare === rarityInput
+      ));
+      isFiltered = true;
+    }
+    this.setState({ filteredCards, isFiltered });
   }
 
   render() {
@@ -151,10 +164,9 @@ class App extends React.Component {
       hasTrunfo,
       isSaveButtonDisabled,
       cards,
-      searchInput,
       filteredCards,
+      isFiltered,
     } = this.state;
-
     const renderCards = (cardsArr) => (
       cardsArr.map((card) => (
         <div className="cardWrapper" key={ card.cardName }>
@@ -181,7 +193,6 @@ class App extends React.Component {
         </div>
       ))
     );
-
     return (
       <>
         <div className="container">
@@ -199,7 +210,6 @@ class App extends React.Component {
             onInputChange={ this.onInputChange }
             onSaveButtonClick={ this.onSaveButtonClick }
           />
-
           <Card
             cardName={ cardName }
             cardDescription={ cardDescription }
@@ -213,20 +223,28 @@ class App extends React.Component {
             previewTitle
           />
         </div>
-
         <h1>Cards</h1>
-
         <input
           type="text"
           id="nameFilter"
-          onChange={ (e) => this.searchCard(e) }
+          name="searchInput"
+          onChange={ this.onInputChange }
           data-testid="name-filter"
         />
-
-        { searchInput.length >= 1 ? renderCards(filteredCards) : renderCards(cards) }
+        <select
+          id="filterByRarity"
+          data-testid="rare-filter"
+          name="rarityInput"
+          onChange={ this.onInputChange }
+        >
+          <option value="todas">todas</option>
+          <option value="normal">normal</option>
+          <option value="raro">raro</option>
+          <option value="muito raro">muito raro</option>
+        </select>
+        { isFiltered ? renderCards(filteredCards) : renderCards(cards) }
       </>
     );
   }
 }
-
 export default App;
