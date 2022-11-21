@@ -7,6 +7,9 @@ Crie seus próprios cards personalizados
 
 <img src="./assets/tryunfo-page.png" alt="drawing" width="700"/>
 
+[![Figma URL](https://img.shields.io/twitter/url?label=See%20in%20figma&logo=figma&logoColor=%234B0082&url=https://www.figma.com/file/psAYBgwjQ1pQqBe3wJvljt/Tryunfo?node-id=0%3A1&t=YpAWmlJfzdmWQJ54-1)](https://www.figma.com/file/psAYBgwjQ1pQqBe3wJvljt/Tryunfo?node-id=0%3A1&t=YpAWmlJfzdmWQJ54-1)
+> estilização em andamento
+
 ## 💻 Tecnologias
 - React
 
